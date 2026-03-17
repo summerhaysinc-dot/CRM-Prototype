@@ -93,3 +93,56 @@ crm-prototype/
 - JWT is stored in `auth_token` HTTP-only cookie.
 - Middleware protects all routes except `/login` and `/api/auth/login`.
 - Company logo is stored locally in `public/company-logo.txt` for prototype simplicity and easy future S3 swap.
+
+## Deploying to AWS (EC2)
+
+Use this flow when shipping fixes such as login/auth bug fixes.
+
+1. SSH into your server and move into the app directory:
+
+   ```bash
+   ssh ec2-user@<your-ec2-host>
+   cd /var/www/crm-prototype
+   ```
+
+2. Pull the fix commit and install dependencies:
+
+   ```bash
+   git fetch --all
+   git checkout <branch-with-fix>
+   git pull origin <branch-with-fix>
+   npm ci
+   ```
+
+3. Ensure production env values are present (`DATABASE_URL`, `JWT_SECRET`):
+
+   ```bash
+   nano .env
+   ```
+
+4. Build the app:
+
+   ```bash
+   npm run build
+   ```
+
+5. Restart the running process (PM2 example):
+
+   ```bash
+   pm2 restart crm-prototype || pm2 start npm --name crm-prototype -- start
+   pm2 save
+   ```
+
+6. Verify the deployment:
+
+   ```bash
+   pm2 status
+   curl -I http://localhost:3000/login
+   ```
+
+If your server uses `systemd` instead of PM2, replace step 5 with:
+
+```bash
+sudo systemctl restart crm-prototype
+sudo systemctl status crm-prototype --no-pager
+```
