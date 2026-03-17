@@ -16,25 +16,20 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    setLoading(false);
 
-      if (!res.ok) {
-        setError("Invalid email or password");
-        return;
-      }
-
-      router.push("/dashboard");
-      router.refresh();
-    } catch {
-      setError("Unable to sign in. Please check your server and database configuration.");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      setError("Invalid email or password");
+      return;
     }
+
+    router.push("/dashboard");
+    router.refresh();
   }
 
   return (
