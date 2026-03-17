@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole @default(user)
+  createdAt    DateTime @default(now())
+}
+
+model Contact {
+  id            String         @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String
+  phone         String
+  company       String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String           @id @default(uuid())
+  contactId String
+  message   String
+  direction MessageDirection
+  createdAt DateTime         @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model Flow {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Sequence {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+}
