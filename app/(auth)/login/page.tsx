@@ -64,6 +64,22 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+    setError("");
+    setLoading(true);
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    setLoading(false);
+
+    if (!res.ok) {
+      setError("Invalid email or password");
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
   }
 
   return (
@@ -77,6 +93,7 @@ export default function LoginPage() {
           <Button className="w-full" disabled={loading}>
             {loading ? "Signing in..." : "Sign in"}
           </Button>
+          <Button className="w-full" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</Button>
         </form>
       </div>
     </main>
